@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Location Links</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    select, button { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
+    .buttons { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Wähle eine Location</h2>
+  <select id="locationSelect">
+    <option value="">-- Bitte auswählen --</option>
+  </select>
+  <div class="buttons" id="linkButtons"></div>
+
+  <script>
+    async function loadCSV(url) {
+      const response = await fetch(url);
+      const text = await response.text();
+      const rows = text.trim().split('\n').slice(1); // Kopfzeile überspringen
+      const data = {};
+
+      rows.forEach(row => {
+        const [location, name, url] = row.split(',');
+        if (!data[location]) data[location] = [];
+        data[location].push({ name: name.trim(), url: url.trim() });
+      });
+
+      return data;
+    }
+
+    const locationSelect = document.getElementById('locationSelect');
+    const linkButtons = document.getElementById('linkButtons');
+
+    loadCSV('data.csv').then(data => {
+      // Dropdown befüllen
+      Object.keys(data).forEach(location => {
+        const option = document.createElement('option');
+        option.value = location;
+        option.textContent = location;
+        locationSelect.appendChild(option);
+      });
+
+      locationSelect.addEventListener('change', () => {
+        const location = locationSelect.value;
+        linkButtons.innerHTML = '';
+        if (data[location]) {
+          data[location].forEach(link => {
+            const btn = document.createElement('button');
+            btn.textContent = link.name;
+            btn.onclick = () => window.open(link.url, '_blank');
+            linkButtons.appendChild(btn);
+          });
+        }
+      });
+    }).catch(err => {
+      linkButtons.innerHTML = '<p style="color:red;">Fehler beim Laden der CSV-Daten.</p>';
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
