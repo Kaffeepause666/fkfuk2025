@@ -25,7 +25,7 @@
       const data = {};
 
       rows.forEach(row => {
-        const [location, name, url] = row.split(';');
+        const [location, name, url] = row.split(',');
         if (!data[location]) data[location] = [];
         data[location].push({ name: name.trim(), url: url.trim() });
       });
