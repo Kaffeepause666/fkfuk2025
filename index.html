@@ -9,18 +9,20 @@
       font-family: sans-serif;
       padding: 20px;
       margin: 0;
-      background-image: url('background.jpg'); /* oder .png */
-      background-size: cover;           /* skaliert das Bild, um den Bildschirm zu füllen */
-      background-repeat: no-repeat;     /* kein Wiederholen */
-      background-position: center;      /* zentriert das Bild */
-      background-attachment: fixed;     /* bleibt beim Scrollen fixiert */
+      background-image: url('background.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: fixed;
     }
+
     select {
       width: 100%;
       padding: 10px;
       font-size: 16px;
       margin-bottom: 20px;
     }
+
     .entry {
       margin-bottom: 30px;
       padding: 15px;
@@ -28,20 +30,35 @@
       border-radius: 8px;
       background-color: #f9f9f9;
     }
+
     .entry h3 {
       margin-top: 0;
       font-size: 18px;
     }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      margin: 5px 0;
+    }
+
+    .button-row button {
+      flex: 1;
+    }
+
     .entry button {
       width: 100%;
       padding: 10px;
       font-size: 15px;
-      margin: 5px 0;
     }
+
     #tourGuideContainer {
-      position: fixed;
       margin-top: 40px;
       text-align: center;
+    }
+
+    #tourGuideContainer .button-row {
+      justify-content: center;
     }
 
     #tourGuideContainer button {
@@ -52,15 +69,14 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      width: 80%;
-      max-width: 400px;
+      max-width: 200px;
     }
   </style>
-  
+
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
 </head>
-  
+
 <body>
   <h2>Wähle eine Location</h2>
   <select id="locationSelect">
@@ -68,11 +84,14 @@
   </select>
 
   <div id="results"></div>
-  
+
   <div id="tourGuideContainer">
-  <button onclick="window.open('https://drive.fkfev.de/s/4jw2ftgeFT9ZMNx')">Tour Guide</button>
+    <div class="button-row">
+      <button onclick="window.open('https://drive.fkfev.de/s/4jw2ftgeFT9ZMNx')">Tour Guide</button>
+      <button onclick="window.location.href='impressum.html'">Impressum &amp; Credits</button>
+    </div>
   </div>
-  
+
   <script>
     async function loadCSV(url) {
       const response = await fetch(url);
@@ -99,6 +118,15 @@
       btn.textContent = label;
       btn.onclick = () => window.open(url, '_blank');
       return btn;
+    }
+
+    function addButtonRow(container, buttons) {
+      const row = document.createElement('div');
+      row.className = 'button-row';
+      buttons.forEach(btn => {
+        if (btn) row.appendChild(btn);
+      });
+      container.appendChild(row);
     }
 
     const locationSelect = document.getElementById('locationSelect');
@@ -134,9 +162,10 @@
           const btn6 = createButton('Niederschlagsradar', entry.weurl);
           const btn7 = createButton('Heutiges Hotel', entry.hourl);
 
-          [btn1, btn2, btn3, btn4, btn5, btn6, btn7].forEach(btn => {
-            if (btn) container.appendChild(btn);
-          });
+          addButtonRow(container, [btn1, btn2]); // Zeile 1
+          addButtonRow(container, [btn3, btn4]); // Zeile 2
+          addButtonRow(container, [btn5, btn6]); // Zeile 3
+          if (btn7) container.appendChild(btn7); // Zeile 4
 
           resultsDiv.appendChild(container);
         });
