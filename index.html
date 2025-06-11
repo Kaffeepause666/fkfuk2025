@@ -132,8 +132,9 @@
           const btn4 = createButton('RCDB', entry.rcdburl);
           const btn5 = createButton('Wettervorhersage', entry.w3url);
           const btn6 = createButton('Niederschlagsradar', entry.weurl);
+          const btn7 = createButton('Heutiges Hotel', entry.hourl);
 
-          [btn1, btn2, btn3, btn4, btn5, btn6].forEach(btn => {
+          [btn1, btn2, btn3, btn4, btn5, btn6, btn7].forEach(btn => {
             if (btn) container.appendChild(btn);
           });
 
