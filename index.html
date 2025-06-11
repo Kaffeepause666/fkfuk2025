@@ -38,10 +38,29 @@
       font-size: 15px;
       margin: 5px 0;
     }
+    #tourGuideContainer {
+  position: relative;
+  margin-top: 40px;
+  text-align: center;
+}
+
+#tourGuideContainer button {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 80%;
+  max-width: 400px;
+}
   </style>
+  
   <link rel="icon" href="icon.png" type="image/png">
   <link rel="apple-touch-icon" href="icon.png">
 </head>
+  
 <body>
   <h2>Wähle eine Location</h2>
   <select id="locationSelect">
@@ -49,7 +68,11 @@
   </select>
 
   <div id="results"></div>
-
+  
+  <div id="tourGuideContainer">
+  <button onclick="window.open('https://drive.fkfev.de/s/4jw2ftgeFT9ZMNx')">Tour Guide</button>
+  </div>
+  
   <script>
     async function loadCSV(url) {
       const response = await fetch(url);
