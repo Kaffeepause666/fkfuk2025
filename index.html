@@ -5,9 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Location Links</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    select, button { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
-    .buttons { margin-top: 20px; }
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .entry {
+      margin-bottom: 30px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+    .entry h3 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    .entry button {
+      width: 100%;
+      padding: 10px;
+      font-size: 15px;
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
@@ -15,30 +39,43 @@
   <select id="locationSelect">
     <option value="">-- Bitte auswählen --</option>
   </select>
-  <div class="buttons" id="linkButtons"></div>
+
+  <div id="results"></div>
 
   <script>
     async function loadCSV(url) {
       const response = await fetch(url);
       const text = await response.text();
-      const rows = text.trim().split('\n').slice(1); // Kopfzeile überspringen
-      const data = {};
+      const rows = text.trim().split('\n');
+      const headers = rows[0].split(',');
+      const data = [];
 
-      rows.forEach(row => {
-        const [location, name, url, parkmap, url2] = row.split(',');
-        if (!data[location]) data[location] = [];
-        data[location].push({ name: name.trim(), url: url.trim() });
-      });
+      for (let i = 1; i < rows.length; i++) {
+        const values = rows[i].split(',');
+        const row = {};
+        headers.forEach((h, index) => {
+          row[h.trim()] = values[index] ? values[index].trim() : '';
+        });
+        data.push(row);
+      }
 
       return data;
     }
 
+    function createButton(label, url) {
+      if (!url) return null;
+      const btn = document.createElement('button');
+      btn.textContent = label;
+      btn.onclick = () => window.open(url, '_blank');
+      return btn;
+    }
+
     const locationSelect = document.getElementById('locationSelect');
-    const linkButtons = document.getElementById('linkButtons');
+    const resultsDiv = document.getElementById('results');
 
     loadCSV('data.csv').then(data => {
-      // Dropdown befüllen
-      Object.keys(data).forEach(location => {
+      const locations = [...new Set(data.map(entry => entry.location))];
+      locations.forEach(location => {
         const option = document.createElement('option');
         option.value = location;
         option.textContent = location;
@@ -46,19 +83,32 @@
       });
 
       locationSelect.addEventListener('change', () => {
-        const location = locationSelect.value;
-        linkButtons.innerHTML = '';
-        if (data[location]) {
-          data[location].forEach(link => {
-            const btn = document.createElement('button');
-            btn.textContent = link.name;
-            btn.onclick = () => window.open(link.url, '_blank');
-            linkButtons.appendChild(btn);
+        const selectedLocation = locationSelect.value;
+        resultsDiv.innerHTML = '';
+
+        const filtered = data.filter(entry => entry.location === selectedLocation);
+        filtered.forEach(entry => {
+          const container = document.createElement('div');
+          container.className = 'entry';
+
+          const title = document.createElement('h3');
+          title.textContent = entry.name;
+          container.appendChild(title);
+
+          const btn1 = createButton('Webseite', entry.url);
+          const btn2 = createButton('Park Map', entry.mpurl);
+          const btn3 = createButton('Coastercount', entry.ccurl);
+          const btn4 = createButton('RCDB', entry.rcdburl);
+
+          [btn1, btn2, btn3, btn4].forEach(btn => {
+            if (btn) container.appendChild(btn);
           });
-        }
+
+          resultsDiv.appendChild(container);
+        });
       });
     }).catch(err => {
-      linkButtons.innerHTML = '<p style="color:red;">Fehler beim Laden der CSV-Daten.</p>';
+      resultsDiv.innerHTML = '<p style="color:red;">Fehler beim Laden der CSV-Daten.</p>';
       console.error(err);
     });
   </script>
